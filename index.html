@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="/lib/leaflet.css" />
+    <script src="/lib/leaflet.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&family=Prompt:wght@100;300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="script.js"></script>
+    <title>Maptrack | Your Work. Simplified.</title>
+  </head>
+  <body>
+    <sidebar class="sidebar">
+      <div class="logo">
+        <p class="logo-text">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="36"
+            height="36"
+            fill="#000000"
+            viewBox="0 0 256 256"
+          >
+            <rect width="256" height="256" fill="none"></rect>
+            <line
+              x1="56"
+              y1="232"
+              x2="200"
+              y2="232"
+              stroke="#9300FF"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            ></line>
+            <circle
+              cx="128"
+              cy="104"
+              r="32"
+              fill="none"
+              stroke="#9300FF"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            ></circle>
+            <path
+              d="M208,104c0,72-80,128-80,128S48,176,48,104a80,80,0,0,1,160,0Z"
+              fill="none"
+              stroke="#9300FF"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="16"
+            ></path>
+          </svg>
+          maptrack
+        </p>
+      </div>
+      <div class="sidebar-content-container">
+        <div class="sidebar-content all-jobs">
+          <h2 class="sidebar-title sidebar-title--all-jobs">My Jobs</h2>
+          <ul class="jobs">
+            <li class="job">
+              <div class="job-profit">$160.00</div>
+              <div class="job-name">Nexus project</div>
+              <div class="job-date">Feb 19</div>
+              <div class="job-chevron">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="#000000"
+                  viewBox="0 0 256 256"
+                >
+                  <rect width="256" height="256" fill="none"></rect>
+                  <polyline
+                    points="96 48 176 128 96 208"
+                    fill="none"
+                    stroke="#808080"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="16"
+                  ></polyline>
+                </svg>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-content job-summary">
+          <h2 class="sidebar-title sidebar-title--job-summary">This Job</h2>
+          <p>
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Laboriosam
+            vitae reiciendis commodi placeat, labore perspiciatis est cum nulla
+            corrupti explicabo fugiat, nostrum culpa dolorem dolorum veniam
+            ipsam amet ad repellat!
+          </p>
+        </div>
+
+        <form class="sidebar-content job-form">
+          <h2 class="sidebar-title sidebar-title--job-form">New Job</h2>
+          <label for="input--job-name">Job Name</label>
+          <input type="text" class="input--job-name" />
+          <label for="input--contact">Contact</label>
+          <input type="text" class="input--contact" />
+          <label for="input--email">Email</label>
+          <input type="email" class="input--email" />
+          <label for="input--description">Work Description</label>
+          <textarea
+            name="description"
+            class="input--description"
+            cols="30"
+            rows="3"
+          ></textarea>
+          <label for="input--rate">Rate Per Hour</label>
+          <input type="number" class="input--rate" />
+
+          <button type="submit" class="btn--create-job">Create Job</button>
+        </form>
+      </div>
+      <footer class="footer">&copy; Jake Smiley 2022</footer>
+    </sidebar>
+    <div id="map"></div>
+    <button class="btn--add-marker">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="44"
+        height="44"
+        fill="#000000"
+        viewBox="0 0 256 256"
+      >
+        <rect width="256" height="256" fill="none"></rect>
+        <line
+          x1="56"
+          y1="232"
+          x2="200"
+          y2="232"
+          stroke="#eeeee0"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="16"
+        ></line>
+        <circle
+          cx="128"
+          cy="104"
+          r="32"
+          fill="none"
+          stroke="#eeeee0"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="16"
+        ></circle>
+        <path
+          d="M208,104c0,72-80,128-80,128S48,176,48,104a80,80,0,0,1,160,0Z"
+          fill="none"
+          stroke="#eeeee0"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="16"
+        ></path>
+      </svg>
+    </button>
+  </body>
+</html>
