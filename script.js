@@ -1,18 +1,42 @@
 "use strict";
-const addMarker = document.querySelector(".btn--add-marker");
+const addMarkerBtn = document.querySelector(".btn--add-marker");
+const jobForm = document.querySelector(".job-form");
+const inputJobName = document.querySelector(".input--job-name");
+const inputContact = document.querySelector(".input--contact");
+const inputEmail = document.querySelector(".input--email");
+const inputDescription = document.querySelector(".input--description");
+const inputRate = document.querySelector(".input--rate");
+
+class Job {
+  constructor(id, name, contact, email, description, rate, coords, status) {
+    this.id = id;
+    this.name = name;
+    this.contact = contact;
+    this.email = email;
+    this.description = description;
+    this.rate = rate;
+    this.coords = coords;
+    this.status = status;
+  }
+}
 
 class App {
   #map;
   #mapEvent;
   #addingNewMarker;
+  #fillingOutForm;
+  #jobs = [];
   constructor() {
     this._getPosition();
-    addMarker.addEventListener("click", this._toggleAddingNewMarker.bind(this));
-    // this._loadMap();
+    addMarkerBtn.addEventListener(
+      "click",
+      this._toggleAddingNewMarker.bind(this)
+    );
+    jobForm.addEventListener("submit", this._createNewJob.bind(this));
+    this._renderAllJobs();
   }
-  _getPosition() {
-    let coords;
 
+  _getPosition() {
     const options = {
       maximumAge: 0,
       enableHighAccuracy: true,
@@ -45,39 +69,84 @@ class App {
     }).addTo(this.#map);
     new L.control.zoom({ position: "topright" }).addTo(this.#map);
 
-    // Not sure how to fix this...
-    // Problem: Can't send event and bind this on _renderMarker at the same time.
-    // Solution: Weird helper function below
-    const markerHelper = function (e) {
-      this._renderMarker(e);
-    };
-    this.#map.addEventListener("click", markerHelper.bind(this));
+    this.#map.addEventListener("click", this._handleClick.bind(this));
   }
 
   _toggleAddingNewMarker() {
+    if (this.#fillingOutForm) return;
+
     this.#addingNewMarker = !this.#addingNewMarker;
     console.log("addingNewMarker = " + this.#addingNewMarker);
     document.querySelector("#map").classList.toggle("adding-new-marker");
   }
 
-  _renderMarker(event) {
+  _handleClick(e) {
+    const clickCoords = [e.latlng.lat, e.latlng.lng];
+    if (this.#addingNewMarker && !this.#fillingOutForm) {
+      this.#mapEvent = e;
+
+      this._renderMarker(clickCoords);
+      this._toggleJobForm();
+    }
+  }
+
+  _renderMarker = function (clickCoords) {
     const myIcon = L.icon({
       iconUrl: "/lib/images/purple-pin.png",
       iconSize: [40, 40],
       iconAnchor: [20, 40],
       popupAnchor: [0, -40],
     });
-    const clickCoords = [event.latlng.lat, event.latlng.lng];
 
-    if (this.#addingNewMarker) {
-      L.marker(clickCoords, { icon: myIcon })
-        .addTo(this.#map)
-        .bindPopup("Another New Job")
-        .openPopup();
-      this.#addingNewMarker = false;
-      document.querySelector("#map").classList.remove("adding-new-marker");
-      // show new job form
-    }
+    L.marker(clickCoords, { icon: myIcon })
+      .addTo(this.#map)
+      .bindPopup("Another New Job")
+      .openPopup();
+
+    this.#addingNewMarker = false;
+    document.querySelector("#map").classList.remove("adding-new-marker");
+  };
+
+  _toggleJobForm() {
+    jobForm.classList.toggle("job-form--active");
+    this.#fillingOutForm = !this.#fillingOutForm;
+    if (this.#fillingOutForm) inputJobName.focus();
+  }
+
+  _createNewJob(e) {
+    e.preventDefault();
+    const id = Math.trunc(Math.random() * 1_000_000_000_000);
+    const newJob = new Job(
+      id,
+      inputJobName.value,
+      inputContact.value,
+      inputEmail.value,
+      inputDescription.value,
+      inputRate.value,
+      [this.#mapEvent.latlng.lat, this.#mapEvent.latlng.lng],
+      "created"
+    );
+    this.#jobs.push(newJob);
+    renderJob(newJob);
+    this._toggleJobForm();
+    this._clearForm();
+    console.log(this.#jobs);
+  }
+  _renderAllJobs() {
+    // if there are any jobs
+    //    for each job
+    //    render job
+  }
+  _renderJob() {
+    // create an html element with current earned money, job name, date created
+  }
+  _clearForm() {
+    inputJobName.value =
+      inputContact.value =
+      inputEmail.value =
+      inputDescription.value =
+      inputRate.value =
+        "";
   }
 }
 

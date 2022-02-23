@@ -48,7 +48,7 @@ input::-webkit-inner-spin-button {
 .all-jobs {
   display: flex;
   flex-direction: column;
-  transform: translateX(-100%);
+  /* transform: translateX(-100%); */
 }
 .job {
   display: grid;
@@ -92,6 +92,9 @@ input::-webkit-inner-spin-button {
   font-size: 1rem;
   transform: translateY(-100%);
   background-color: #eeeee0;
+}
+.job-form.job-form--active {
+  transform: translateY(0);
 }
 .job-form h3 {
   font-weight: 500;
