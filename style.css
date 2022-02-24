@@ -3,7 +3,8 @@
 #9300FF
 
 */
-
+/* ---------------------------------------- */
+/* General Styles */
 * {
   margin: 0;
   padding: 0;
@@ -32,6 +33,9 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+
+/* ---------------------------------------- */
+/* Sidebar */
 .sidebar {
   width: 40rem;
   background-color: white;
@@ -63,6 +67,32 @@ input::-webkit-inner-spin-button {
   position: absolute;
   transition: all 0.3s ease;
 }
+.logo {
+  height: 6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+}
+.logo-text {
+  font-family: "Comfortaa", cursive;
+  background: -webkit-linear-gradient(45deg, #9300ff, #99b0b0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  text-align: center;
+  height: 4rem;
+  margin-top: auto;
+}
+
+/* ---------------------------------------- */
+/* All Jobs */
 .all-jobs {
   display: flex;
   flex-direction: column;
@@ -106,6 +136,8 @@ input::-webkit-inner-spin-button {
   align-items: center;
 }
 
+/* ---------------------------------------- */
+/* Job Summary */
 .job-summary {
   /* width must equal sidebar-content-container */
   padding: 0 1rem;
@@ -137,6 +169,8 @@ input::-webkit-inner-spin-button {
 .job-summary--contact div {
   margin-top: 0.6rem;
 }
+/* ---------------------------------------- */
+/* Task */
 .task-label,
 .task {
   display: grid;
@@ -159,11 +193,6 @@ input::-webkit-inner-spin-button {
   padding: 1rem 0;
   border-bottom: 1px solid rgba(128, 128, 128, 0.233);
 }
-/* .task-qty,
-.task-rate {
-  padding-right: 0.25rem;
-} */
-
 .new-task {
   align-items: center;
   height: 3.6rem;
@@ -197,14 +226,12 @@ input::-webkit-inner-spin-button {
   color: white;
   background-color: #9300ff;
   font-size: 1.6rem;
-
   right: 20rem;
 }
 .new-task-btn-label {
   user-select: none;
   cursor: pointer;
 }
-
 .new-task-input--qty,
 .new-task-input--rate {
   width: 90%;
@@ -228,6 +255,9 @@ input::-webkit-inner-spin-button {
   visibility: visible;
   opacity: 1;
 }
+
+/* ---------------------------------------- */
+/* Job Form */
 .job-form {
   display: flex;
   flex-direction: column;
@@ -273,17 +303,6 @@ input::-webkit-inner-spin-button {
   display: flex;
   gap: 3rem;
 }
-
-.work-item-label {
-  border-bottom: 1px solid #808080;
-}
-.work-item {
-  display: grid;
-  grid-template-columns: 1fr 3fr 1fr 1fr;
-  margin-top: 0.4rem;
-  gap: 1rem;
-}
-
 .btn--create-job {
   width: 14rem;
   align-self: center;
@@ -299,51 +318,28 @@ input::-webkit-inner-spin-button {
 .btn--create-job:active {
   transform: translateY(2px);
 }
-.logo {
-  height: 6rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 3rem;
-}
-.logo-text {
-  font-family: "Comfortaa", cursive;
-  background: -webkit-linear-gradient(45deg, #9300ff, #99b0b0);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.leaflet-interactive.adding-new-marker,
-.leaflet-grab.adding-new-marker {
-  cursor: url("/lib/images/purple-pin-cursor.png") 20 42, auto;
-}
-.footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1rem;
-  text-align: center;
-  height: 4rem;
-  margin-top: auto;
-}
+
+/* ---------------------------------------- */
+/* Map */
 .btn--add-marker {
   position: absolute;
   bottom: 4rem;
   right: 4rem;
   background-color: #9300ff;
-
   border-radius: 50%;
   padding: 1.2rem;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.438);
-
   z-index: 1000;
 }
-
 .btn--add-marker {
   cursor: pointer;
 }
 #map {
   flex: 1;
+}
+.leaflet-interactive.adding-new-marker,
+.leaflet-grab.adding-new-marker {
+  cursor: url("/lib/images/purple-pin-cursor.png") 20 42, auto;
 }
 /* lol.. Nothing wrong here */
 .greenIcon {
