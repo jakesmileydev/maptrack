@@ -89,19 +89,26 @@ class App {
     //prettier-ignore
     jobSummaryBackBtn.addEventListener("click", this._closeJobSummary.bind(this));
 
-    jobFormCloseBtn.addEventListener("click", this._closeForm.bind(this));
+    jobFormCloseBtn.addEventListener("click", this._closeJobForm.bind(this));
 
     newTask.addEventListener("click", this._addNewTask.bind(this));
   }
 
-  _toggleAddingTaskClass() {
-    newTaskBtnContainer.classList.toggle("adding-task");
-    newTask.classList.toggle("adding-task");
+  _openTaskEdit() {
+    newTaskBtnContainer.classList.add("adding-task");
+    newTask.classList.add("adding-task");
     newTaskInputs.forEach((input) => {
-      input.classList.toggle("adding-task");
+      input.classList.add("adding-task");
     });
   }
 
+  _closeTaskEdit() {
+    newTaskBtnContainer.classList.remove("adding-task");
+    newTask.classList.remove("adding-task");
+    newTaskInputs.forEach((input) => {
+      input.classList.remove("adding-task");
+    });
+  }
   _addNewTask(e) {
     if (this.#addingNewTask) {
       if (!e.target.closest(".new-task-btn")) return;
@@ -126,10 +133,10 @@ class App {
       this._renderTask(task);
       // 4. clear form
       newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
-      this._toggleAddingTaskClass();
+      this._closeTaskEdit();
     }
     if (!this.#addingNewTask) {
-      this._toggleAddingTaskClass();
+      this._openTaskEdit();
       // 1. set focus to description input
       setTimeout(() => {
         newTaskDesc.focus();
@@ -138,10 +145,15 @@ class App {
     this.#addingNewTask = !this.#addingNewTask;
   }
 
-  _closeForm() {
-    this.#map.removeLayer(this.#tempMarker);
-    jobForm.classList.toggle("job-form--active");
+  _closeJobForm(e) {
+    jobForm.classList.remove("job-form--active");
     this.#fillingOutForm = false;
+
+    // if this event was triggered by the close btn before creating a job, remove the marker
+    if (!e) return;
+    if (e.target === jobFormCloseBtn) {
+      this.#map.removeLayer(this.#tempMarker);
+    }
   }
 
   _openJobSummary(e) {
@@ -188,7 +200,7 @@ class App {
   _closeJobSummary() {
     setTimeout(() => {
       document.querySelectorAll(".task").forEach((task) => task.remove());
-      this._toggleAddingTaskClass();
+      this._closeTaskEdit();
     }, 250);
     allJobs.classList.remove("all-jobs--hidden");
     jobSummary.classList.remove("job-summary--active");
@@ -242,7 +254,7 @@ class App {
       this.#mapEvent = e;
 
       this._renderMarker(clickCoords);
-      this._toggleJobForm();
+      this._openJobForm();
     }
   }
 
@@ -264,10 +276,10 @@ class App {
     document.querySelector("#map").classList.remove("adding-new-marker");
   }
 
-  _toggleJobForm() {
-    jobForm.classList.toggle("job-form--active");
-    this.#fillingOutForm = !this.#fillingOutForm;
-    if (this.#fillingOutForm) inputJobName.focus();
+  _openJobForm() {
+    jobForm.classList.add("job-form--active");
+    this.#fillingOutForm = true;
+    inputJobName.focus();
   }
 
   _createNewJob(e) {
@@ -296,8 +308,8 @@ class App {
     );
     this.#jobs.push(newJob);
     this._renderJob(newJob);
-    this._toggleJobForm();
-    this._clearForm();
+    this._closeJobForm();
+    this._clearJobForm();
   }
 
   _renderAllJobs() {
@@ -325,7 +337,7 @@ class App {
     jobs.insertAdjacentHTML("afterbegin", HTML);
   }
 
-  _clearForm() {
+  _clearJobForm() {
     inputJobName.value =
       inputContact.value =
       inputEmail.value =
