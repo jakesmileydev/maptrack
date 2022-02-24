@@ -93,15 +93,16 @@ class App {
 
     newTask.addEventListener("click", this._addNewTask.bind(this));
   }
-  _addNewTask(e) {
-    const toggleAddingClasses = function () {
-      newTaskBtnContainer.classList.toggle("adding");
-      newTask.classList.toggle("adding-task");
-      newTaskInputs.forEach((input) => {
-        input.classList.toggle("adding-task");
-      });
-    };
 
+  _toggleAddingTaskClass() {
+    newTaskBtnContainer.classList.toggle("adding-task");
+    newTask.classList.toggle("adding-task");
+    newTaskInputs.forEach((input) => {
+      input.classList.toggle("adding-task");
+    });
+  }
+
+  _addNewTask(e) {
     if (this.#addingNewTask) {
       if (!e.target.closest(".new-task-btn")) return;
       console.log(newTaskDesc.value, newTaskQty.value, newTaskRate.value);
@@ -125,10 +126,10 @@ class App {
       this._renderTask(task);
       // 4. clear form
       newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
-      toggleAddingClasses();
+      this._toggleAddingTaskClass();
     }
     if (!this.#addingNewTask) {
-      toggleAddingClasses();
+      this._toggleAddingTaskClass();
       // 1. set focus to description input
       setTimeout(() => {
         newTaskDesc.focus();
@@ -187,7 +188,8 @@ class App {
   _closeJobSummary() {
     setTimeout(() => {
       document.querySelectorAll(".task").forEach((task) => task.remove());
-    }, 300);
+      this._toggleAddingTaskClass();
+    }, 250);
     allJobs.classList.remove("all-jobs--hidden");
     jobSummary.classList.remove("job-summary--active");
   }
