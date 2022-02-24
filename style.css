@@ -1,3 +1,15 @@
+/* 
+#1E1E24
+#21A179
+#FF0000
+#EEEEE0
+#9300FF
+#9A8C98
+
+maybe
+#9948AD
+*/
+
 * {
   margin: 0;
   padding: 0;
@@ -8,26 +20,36 @@
 body {
   display: flex;
   height: 100vh;
-  padding: 2rem;
+}
+button {
+  outline: none;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
 }
 ul {
   list-style: none;
+}
+input {
+  outline: none;
+  border: none;
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
 .sidebar {
-  width: 32rem;
-  background-color: #eeeee0;
+  width: 40rem;
+  background-color: white;
 }
 .sidebar-content-container {
-  /* subtract height of logo and footer */
-  height: calc(100% - 12rem);
+  /* subtract height of logo + footer */
+  height: calc(100% - 10rem);
 
-  width: 32rem;
+  width: 40rem;
   min-height: 10rem;
   position: relative;
+  /* overflow-x: hidden; */
   overflow-y: scroll;
 }
 .sidebar-content-container::-webkit-scrollbar {
@@ -36,10 +58,12 @@ input::-webkit-inner-spin-button {
 .sidebar-title {
   font-weight: 500;
   margin: 1rem 0;
+  text-align: center;
 }
 .sidebar-title--all-jobs {
   padding: 0 1rem;
 }
+
 .sidebar-content {
   width: 100%;
   position: absolute;
@@ -48,26 +72,38 @@ input::-webkit-inner-spin-button {
 .all-jobs {
   display: flex;
   flex-direction: column;
-  /* transform: translateX(-100%); */
+}
+.all-jobs.all-jobs--hidden {
+  transform: translateX(-100%);
 }
 .job {
   display: grid;
   grid-template-columns: 4fr 10fr 3fr 1fr;
   align-items: center;
-  border-radius: 2px;
+
   margin: 1rem;
   font-size: 1.6rem;
   padding: 0.6rem 0.2rem 0.6rem 0.8rem;
-  background-color: #eeeee0;
-  box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.13);
+  background-color: white;
+  box-shadow: 2px 2px 16px rgba(0, 0, 0, 0.15);
   border-left: 8px solid #9300ff;
+  cursor: pointer;
+}
+.job.job--active {
+  border-color: #21a179;
 }
 .job:first-child {
   margin-top: 0rem;
 }
-.job-profit {
+.job-name {
+  font-size: 1.4rem;
+}
+.job-earnings {
   font-size: 1.2rem;
   color: #9300ff;
+}
+.job-earnings.job-earnings--active {
+  color: #21a179;
 }
 .job-date {
   font-size: 1rem;
@@ -80,10 +116,115 @@ input::-webkit-inner-spin-button {
 .job-summary {
   /* width must equal sidebar-content-container */
   padding: 0 1rem;
-  width: 32rem;
+  width: 40rem;
 
   transform: translateX(100%);
   position: fixed;
+}
+.job-summary.job-summary--active {
+  transform: translateX(0%);
+}
+.job-summary--back-btn {
+  position: absolute;
+  top: 1.2rem;
+  left: 2rem;
+  font-size: 1.4rem;
+}
+.job-summary--info {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+.job-summary--info label {
+  display: block;
+  width: 70%;
+  border-bottom: 1px solid grey;
+  margin-bottom: 0.4rem;
+  margin-top: 1rem;
+}
+.job-summary--contact div {
+  margin-top: 0.6rem;
+}
+.task-label,
+.task {
+  display: grid;
+  grid-template-columns: 5fr 1fr 1.2fr 1.4fr;
+}
+
+.task-rate,
+.task-label-rate,
+.task-amount,
+.task-label-amount,
+.task-qty,
+.task-label-qty {
+  text-align: right;
+}
+.task-label {
+  border-bottom: 1px solid grey;
+  margin-top: 2rem;
+}
+.task {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.233);
+}
+/* .task-qty,
+.task-rate {
+  padding-right: 0.25rem;
+} */
+
+.new-task {
+  align-items: center;
+  height: 3.6rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.233);
+  display: grid;
+  grid-template-columns: 5.2fr 1.3fr 1.25fr 1.4fr;
+}
+
+.new-task-btn-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: absolute;
+  right: 15.6rem;
+  transition: all 1s;
+}
+.new-task-btn-container.adding {
+  right: -7.8rem;
+  gap: 2rem;
+}
+.new-task-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 2rem;
+  color: white;
+  background-color: #9300ff;
+  font-size: 1.6rem;
+
+  right: 20rem;
+}
+
+.new-task-input--qty,
+.new-task-input--rate {
+  width: 3.8rem;
+  justify-self: flex-end;
+  text-align: right;
+}
+.new-task-input--qty,
+.new-task-input--rate,
+.new-task-input--description {
+  padding: 0.2rem 0.4rem;
+  font-size: 1rem;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.082);
+  border: 1px solid rgba(128, 128, 128, 0.253);
+  visibility: hidden;
+  opacity: 0;
+  transition: all 1s;
+}
+.new-task-input--qty.adding-task,
+.new-task-input--rate.adding-task,
+.new-task-input--description.adding-task {
+  visibility: visible;
+  opacity: 1;
 }
 .job-form {
   display: flex;
@@ -91,7 +232,7 @@ input::-webkit-inner-spin-button {
   padding: 0 1rem 1rem 1rem;
   font-size: 1rem;
   transform: translateY(-100%);
-  background-color: #eeeee0;
+  background-color: white;
 }
 .job-form.job-form--active {
   transform: translateY(0);
@@ -100,6 +241,12 @@ input::-webkit-inner-spin-button {
   font-weight: 500;
   margin: 0.6rem 0;
 }
+.job-form--close-btn {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.4rem;
+  font-size: 1.6rem;
+}
 .job-form input,
 .input--description {
   font-size: 1rem;
@@ -107,8 +254,10 @@ input::-webkit-inner-spin-button {
   border: none;
   padding: 0.25rem;
   resize: none;
+  border-radius: 2px;
   margin-top: 0.2rem;
   margin-bottom: 0.8rem;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.116);
 }
 
 .add-work {
@@ -141,6 +290,10 @@ input::-webkit-inner-spin-button {
   background-color: #9300ff;
   color: #eeeee0;
 }
+
+.btn--create-job:active {
+  transform: translateY(2px);
+}
 .logo {
   height: 6rem;
   display: flex;
@@ -165,7 +318,7 @@ input::-webkit-inner-spin-button {
   align-items: center;
   font-size: 1rem;
   text-align: center;
-  height: 6rem;
+  height: 4rem;
   margin-top: auto;
 }
 .btn--add-marker {
@@ -173,8 +326,7 @@ input::-webkit-inner-spin-button {
   bottom: 4rem;
   right: 4rem;
   background-color: #9300ff;
-  outline: none;
-  border: none;
+
   border-radius: 50%;
   padding: 1.2rem;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.438);
