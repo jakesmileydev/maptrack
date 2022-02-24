@@ -1,15 +1,24 @@
 "use strict";
+
 const addMarkerBtn = document.querySelector(".btn--add-marker");
 const allJobs = document.querySelector(".all-jobs");
 const jobSummary = document.querySelector(".job-summary");
 const jobSummaryBackBtn = document.querySelector(".job-summary--back-btn");
+
+const jobSummaryTitle = document.querySelector(".sidebar-title--job-summary");
+const contactName = document.querySelector(".contact-name");
+const contactPhone = document.querySelector(".contact-phone");
+const contactEmail = document.querySelector(".contact-email");
+const summaryId = document.querySelector(".summary-id");
+const summaryDate = document.querySelector(".summary-date");
+
 const jobFormCloseBtn = document.querySelector(".job-form--close-btn");
 const jobs = document.querySelector(".jobs");
 const jobForm = document.querySelector(".job-form");
 const inputJobName = document.querySelector(".input--job-name");
 const inputContact = document.querySelector(".input--contact");
 const inputEmail = document.querySelector(".input--email");
-const inputDescription = document.querySelector(".input--description");
+const inputDetails = document.querySelector(".input--details");
 const inputPhone = document.querySelector(".input--phone");
 const newTask = document.querySelector(".new-task");
 const newTaskBtn = document.querySelector(".new-task-btn");
@@ -18,32 +27,42 @@ const newTaskDesc = document.querySelector(".new-task-input--description");
 const newTaskQty = document.querySelector(".new-task-input--qty");
 const newTaskRate = document.querySelector(".new-task-input--rate");
 const newTaskInputs = document.querySelectorAll(".new-task-input");
+
 // prettier-ignore
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+class Task {
+  constructor(description, quantity, rate, amount) {
+    this.description = description;
+    this.quantity = quantity;
+    this.rate = rate;
+    this.amount = amount;
+  }
+}
+
 class Job {
-  constructor(
-    id,
-    name,
-    contact,
-    email,
-    description,
-    phone,
-    coords,
-    status,
-    marker
-  ) {
+  #tasks;
+  //prettier-ignore
+  constructor(id,name,contact,email,details,phone,coords,status,marker) {
     this.id = id;
     this.name = name;
     this.contact = contact;
     this.email = email;
-    this.description = description;
+    this.details = details;
     this.phone = phone;
     this.coords = coords;
     this.status = status;
     this.marker = marker;
-    this.earnings = 0;
+
     this.date = new Date();
+    this.#tasks = new Array();
+  }
+
+  _pushTask(task) {
+    this.#tasks.push(task);
+  }
+  _getTasks() {
+    return this.#tasks;
   }
 }
 
@@ -55,67 +74,120 @@ class App {
   #addingNewTask;
   #tempMarker;
   #jobs = [];
+  #currentJob;
 
   constructor() {
     this._getPosition();
-    addMarkerBtn.addEventListener(
-      "click",
-      this._toggleAddingNewMarker.bind(this)
-    );
+    //prettier-ignore
+    addMarkerBtn.addEventListener("click", this._toggleAddingNewMarker.bind(this));
+
     jobForm.addEventListener("submit", this._createNewJob.bind(this));
+
     this._renderAllJobs();
+
     jobs.addEventListener("click", this._openJobSummary.bind(this));
-    jobSummaryBackBtn.addEventListener(
-      "click",
-      this._closeJobSummary.bind(this)
-    );
+    //prettier-ignore
+    jobSummaryBackBtn.addEventListener("click", this._closeJobSummary.bind(this));
+
     jobFormCloseBtn.addEventListener("click", this._closeForm.bind(this));
 
     newTask.addEventListener("click", this._addNewTask.bind(this));
   }
   _addNewTask(e) {
-    if (!e.target.closest(".new-task-btn")) return;
-    console.log(this.#addingNewTask);
     const toggleAddingClasses = function () {
       newTaskBtnContainer.classList.toggle("adding");
+      newTask.classList.toggle("adding-task");
       newTaskInputs.forEach((input) => {
         input.classList.toggle("adding-task");
       });
     };
+
     if (this.#addingNewTask) {
+      if (!e.target.closest(".new-task-btn")) return;
       console.log(newTaskDesc.value, newTaskQty.value, newTaskRate.value);
-      // create new task item
-      console.log("create new task item and push to object");
-      newTaskBtnContainer.classList.remove("adding");
-      newTaskInputs.forEach((input) => {
-        input.classList.remove("adding-task");
-      });
-      this.#addingNewTask = false;
+      if (!newTaskDesc.value || !newTaskQty.value || !newTaskRate.value) {
+        alert("invalid task inputs");
+        return;
+      }
+      // 1. create new task object
+      const amount = (
+        Number(newTaskQty.value) * Number(newTaskRate.value)
+      ).toFixed(2);
+      const task = new Task(
+        newTaskDesc.value,
+        newTaskQty.value,
+        newTaskRate.value,
+        amount
+      );
+      // 2. push task to an array of tasks in the job object
+      this.#currentJob._pushTask(task);
+      // 3. render new task on the list
+      this._renderTask(task);
+      // 4. clear form
+      newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
+      toggleAddingClasses();
     }
     if (!this.#addingNewTask) {
-      newTaskBtnContainer.classList.remove("adding");
-      newTaskInputs.forEach((input) => {
-        input.classList.remove("adding-task");
-      });
-      this.#addingNewTask = true;
+      toggleAddingClasses();
+      // 1. set focus to description input
+      setTimeout(() => {
+        newTaskDesc.focus();
+      }, 100);
     }
+    this.#addingNewTask = !this.#addingNewTask;
   }
+
   _closeForm() {
     this.#map.removeLayer(this.#tempMarker);
     jobForm.classList.toggle("job-form--active");
     this.#fillingOutForm = false;
   }
+
   _openJobSummary(e) {
-    const thisJob = this.#jobs.find(
-      (job) => (job.id = e.target.closest(".job").dataset.id)
+    console.log(e.target.closest(".job"));
+
+    if (!e.target.closest(".job")) return;
+
+    this.#currentJob = this.#jobs.find(
+      (job) => job.id === Number(e.target.closest(".job").dataset.id)
     );
+    const displayDate = `${
+      months[this.#currentJob.date.getMonth()]
+    } ${this.#currentJob.date.getDate()}, ${this.#currentJob.date.getFullYear()}`;
+    jobSummaryTitle.textContent = this.#currentJob.name;
+    summaryDate.textContent = displayDate;
+    summaryId.textContent = this.#currentJob.id;
+    contactName.textContent = this.#currentJob.contact;
+    contactPhone.textContent = this.#currentJob.phone;
+    contactEmail.textContent = this.#currentJob.email;
+
+    // 1. if there are existing tasks
+    if (this.#currentJob._getTasks().length > 0) {
+      console.log(this.#currentJob._getTasks());
+      // 2. render tasks
+      this.#currentJob._getTasks().forEach((task) => this._renderTask(task));
+    }
 
     allJobs.classList.add("all-jobs--hidden");
-    // update job summary
-
     jobSummary.classList.add("job-summary--active");
   }
+
+  _renderTask(task) {
+    const HTML = `
+          <li class="task">
+            <div class="task-description">${task.description}</div>
+            <div class="task-qty">${Number(task.quantity)}</div>
+            <div class="task-rate">${Number(task.rate).toFixed(2)}</div>
+            <div class="task-amount">${task.amount}</div>
+          </li>
+          `;
+    newTask.insertAdjacentHTML("beforebegin", HTML);
+  }
+
   _closeJobSummary() {
+    setTimeout(() => {
+      document.querySelectorAll(".task").forEach((task) => task.remove());
+    }, 300);
     allJobs.classList.remove("all-jobs--hidden");
     jobSummary.classList.remove("job-summary--active");
   }
@@ -152,18 +224,17 @@ class App {
     }).addTo(this.#map);
     new L.control.zoom({ position: "topright" }).addTo(this.#map);
 
-    this.#map.addEventListener("click", this._handleClick.bind(this));
+    this.#map.addEventListener("click", this._handleMapClick.bind(this));
   }
 
   _toggleAddingNewMarker() {
     if (this.#fillingOutForm) return;
 
     this.#addingNewMarker = !this.#addingNewMarker;
-    console.log("addingNewMarker = " + this.#addingNewMarker);
     document.querySelector("#map").classList.toggle("adding-new-marker");
   }
 
-  _handleClick(e) {
+  _handleMapClick(e) {
     const clickCoords = [e.latlng.lat, e.latlng.lng];
     if (this.#addingNewMarker && !this.#fillingOutForm) {
       this.#mapEvent = e;
@@ -173,7 +244,7 @@ class App {
     }
   }
 
-  _renderMarker = function (clickCoords) {
+  _renderMarker(clickCoords) {
     const myIcon = L.icon({
       iconUrl: "/lib/images/purple-pin.png",
       iconSize: [40, 40],
@@ -189,7 +260,7 @@ class App {
 
     this.#addingNewMarker = false;
     document.querySelector("#map").classList.remove("adding-new-marker");
-  };
+  }
 
   _toggleJobForm() {
     jobForm.classList.toggle("job-form--active");
@@ -204,7 +275,6 @@ class App {
       !inputJobName.value ||
       !inputContact.value ||
       !inputEmail.value ||
-      !inputDescription.value ||
       !inputPhone.value
     ) {
       alert("Invalid Form Submission, please verify data");
@@ -216,7 +286,7 @@ class App {
       inputJobName.value,
       inputContact.value,
       inputEmail.value,
-      inputDescription.value,
+      inputDetails.value,
       inputPhone.value,
       [this.#mapEvent.latlng.lat, this.#mapEvent.latlng.lng],
       "active",
@@ -226,17 +296,18 @@ class App {
     this._renderJob(newJob);
     this._toggleJobForm();
     this._clearForm();
-    console.log(this.#jobs);
   }
+
   _renderAllJobs() {
     // if there are any jobs
     //    for each job
     //      render job
   }
+
   _renderJob(job) {
     const HTML = `
     <li class="job" data-id="${job.id}">
-      <div class="job-earnings">$${job.earnings.toFixed(2)}</div>
+      <div class="job-id">#${job.id}</div>
       <div class="job-name">${job.name}</div>
       <div class="job-date">${
         months[job.date.getMonth()]
@@ -251,11 +322,12 @@ class App {
     `;
     jobs.insertAdjacentHTML("afterbegin", HTML);
   }
+
   _clearForm() {
     inputJobName.value =
       inputContact.value =
       inputEmail.value =
-      inputDescription.value =
+      inputDetails.value =
       inputPhone.value =
         "";
   }

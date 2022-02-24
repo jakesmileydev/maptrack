@@ -67,7 +67,7 @@ input::-webkit-inner-spin-button {
 .sidebar-content {
   width: 100%;
   position: absolute;
-  transition: transform 0.5s;
+  transition: all 0.3s ease;
 }
 .all-jobs {
   display: flex;
@@ -98,13 +98,11 @@ input::-webkit-inner-spin-button {
 .job-name {
   font-size: 1.4rem;
 }
-.job-earnings {
-  font-size: 1.2rem;
+.job-id {
+  font-size: 1rem;
   color: #9300ff;
 }
-.job-earnings.job-earnings--active {
-  color: #21a179;
-}
+
 .job-date {
   font-size: 1rem;
 }
@@ -113,13 +111,14 @@ input::-webkit-inner-spin-button {
   justify-content: center;
   align-items: center;
 }
+
 .job-summary {
   /* width must equal sidebar-content-container */
   padding: 0 1rem;
   width: 40rem;
 
   transform: translateX(100%);
-  position: fixed;
+  position: absolute;
 }
 .job-summary.job-summary--active {
   transform: translateX(0%);
@@ -178,14 +177,19 @@ input::-webkit-inner-spin-button {
   display: grid;
   grid-template-columns: 5.2fr 1.3fr 1.25fr 1.4fr;
 }
-
+.new-task:hover {
+  cursor: pointer;
+}
+.new-task.adding-task {
+  cursor: default;
+}
 .new-task-btn-container {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   position: absolute;
   right: 15.6rem;
-  transition: all 1s;
+  transition: all 0.3s ease;
 }
 .new-task-btn-container.adding {
   right: -7.8rem;
@@ -202,10 +206,14 @@ input::-webkit-inner-spin-button {
 
   right: 20rem;
 }
+.new-task-btn-label {
+  user-select: none;
+  cursor: pointer;
+}
 
 .new-task-input--qty,
 .new-task-input--rate {
-  width: 3.8rem;
+  width: 90%;
   justify-self: flex-end;
   text-align: right;
 }
@@ -218,7 +226,7 @@ input::-webkit-inner-spin-button {
   border: 1px solid rgba(128, 128, 128, 0.253);
   visibility: hidden;
   opacity: 0;
-  transition: all 1s;
+  transition: all 0.3s ease;
 }
 .new-task-input--qty.adding-task,
 .new-task-input--rate.adding-task,
@@ -248,7 +256,7 @@ input::-webkit-inner-spin-button {
   font-size: 1.6rem;
 }
 .job-form input,
-.input--description {
+.input--details {
   font-size: 1rem;
   outline: none;
   border: none;
@@ -259,7 +267,9 @@ input::-webkit-inner-spin-button {
   margin-bottom: 0.8rem;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.116);
 }
-
+.input--details-optional {
+  color: rgba(128, 128, 128, 0.589);
+}
 .add-work {
   display: flex;
   flex-direction: column;
@@ -340,6 +350,7 @@ input::-webkit-inner-spin-button {
 #map {
   flex: 1;
 }
+/* lol.. Nothing wrong here */
 .greenIcon {
   background-color: #9300ff;
 }

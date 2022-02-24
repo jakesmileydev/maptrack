@@ -19,7 +19,7 @@
 
     <link rel="stylesheet" href="style.css" />
     <script defer src="script.js"></script>
-    <title>Maptrack | Your Work, Simplified.</title>
+    <title>Maptrack | Job tracking and invoice for small businesses</title>
   </head>
   <body>
     <sidebar class="sidebar">
@@ -72,7 +72,6 @@
         </div>
 
         <div class="sidebar-content job-summary">
-          <button class="job-summary--back-btn">&larr;</button>
           <h2 class="sidebar-title sidebar-title--job-summary">
             Nexus Project
           </h2>
@@ -80,21 +79,20 @@
             <div>
               <label for="job-summary--contact">Contact</label>
               <div class="job-summary--contact">
-                <div class="job-summary--contact-name">Alan J Eslinger</div>
-                <div class="job-summary--contact-phone">360-387-6665</div>
-                <div class="job-summary--contact-email">
-                  alanisreallycool@gmail.com
-                </div>
+                <div class="contact-name">Alan J Eslinger</div>
+                <div class="contact-phone">360-387-6665</div>
+                <div class="contact-email">alanisreallycool@gmail.com</div>
               </div>
             </div>
             <div>
-              <label for="job-summary--id">ID #</label>
-              <div class="job-summary--id">366548110</div>
-              <label for="job-summary--date">Date</label>
-              <div class="job-summary--date">Jan 23, 2022</div>
+              <label for="summary-id">ID #</label>
+              <div class="summary-id">366548110</div>
+              <label for="summary-date">Job Start</label>
+              <div class="summary-date">Jan 23, 2022</div>
             </div>
           </div>
 
+          <button class="job-summary--back-btn">&larr;</button>
           <div class="job-summary--tasks">
             <label for="tasks" class="task-label">
               <div>Description</div>
@@ -103,26 +101,6 @@
               <div class="task-label-amount">Amount</div>
             </label>
             <ul class="tasks">
-              <li class="task">
-                <div class="task-description">Concrete(yards)</div>
-                <div class="task-qty">26</div>
-                <div class="task-rate">100.00</div>
-                <div class="task-amount">2,600.00</div>
-              </li>
-              <li class="task">
-                <div class="task-description">
-                  Concrete Install (4 Journeyman Carpenters)
-                </div>
-                <div class="task-qty">8</div>
-                <div class="task-rate">40.00</div>
-                <div class="task-amount">100.00</div>
-              </li>
-              <li class="task">
-                <div class="task-description">Lunch</div>
-                <div class="task-qty">1</div>
-                <div class="task-rate">100.00</div>
-                <div class="task-amount">100.00</div>
-              </li>
               <li class="new-task">
                 <input
                   type="text"
@@ -153,18 +131,21 @@
         <form class="sidebar-content job-form">
           <h2 class="sidebar-title sidebar-title--job-form">New Job</h2>
           <button type="button" class="job-form--close-btn">✖</button>
-          <label for="input--job-name">Job Name</label>
+          <label for="input--job-name">Job Name*</label>
           <input type="text" class="input--job-name" />
-          <label for="input--contact">Contact</label>
+          <label for="input--contact">Contact*</label>
           <input type="text" class="input--contact" />
-          <label for="input--phone">Phone</label>
+          <label for="input--phone">Phone*</label>
           <input type="tel" class="input--phone" />
-          <label for="input--email">Email</label>
+          <label for="input--email">Email*</label>
           <input type="email" class="input--email" />
-          <label for="input--description">Work Description</label>
+          <label for="input--details"
+            >Additional Details
+            <span class="input--details-optional">(optional)</span></label
+          >
           <textarea
             name="description"
-            class="input--description"
+            class="input--details"
             cols="30"
             rows="3"
           ></textarea>
