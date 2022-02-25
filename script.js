@@ -28,6 +28,9 @@ const newTaskQty = document.querySelector(".new-task-input--qty");
 const newTaskRate = document.querySelector(".new-task-input--rate");
 const newTaskInputs = document.querySelectorAll(".new-task-input");
 
+const totalAmount = document.querySelector(".totalAmount");
+const paidAmount = document.querySelector(".paid-amount");
+const balanceAmount = document.querySelector(".balance-amount");
 // prettier-ignore
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -36,11 +39,13 @@ class Task {
     this.description = description;
     this.quantity = quantity;
     this.rate = rate;
-    this.amount = amount;
+    this.amount = Number(amount);
   }
 }
 
 class Job {
+  #total;
+  #totalPaid;
   #tasks;
   //prettier-ignore
   constructor(id,name,contact,email,details,phone,coords,status,marker) {
@@ -55,6 +60,7 @@ class Job {
     this.marker = marker;
     this.date = new Date();
     this.#tasks = new Array();
+    this.#total = 0;
   }
 
   _pushTask(task) {
@@ -62,6 +68,15 @@ class Job {
   }
   _getTasks() {
     return this.#tasks;
+  }
+  _setTotal() {
+    this.#tasks.forEach((task) => {
+      console.log(task.amount);
+      this.#total += task.amount;
+    });
+  }
+  _getTotal() {
+    return this.#total;
   }
 }
 
@@ -261,6 +276,7 @@ class App {
     allJobs.classList.add("all-jobs--hidden");
     jobSummary.classList.add("job-summary--active");
   }
+
   _addNewTask(e) {
     if (this.#addingNewTask) {
       if (!e.target.closest(".new-task-btn")) return;
@@ -279,8 +295,11 @@ class App {
         newTaskRate.value,
         amount
       );
-      // 2. push task to an array of tasks in the job object
+      // 2a. push task to an array of tasks in the job object
       this.#currentJob._pushTask(task);
+      // 2b. updateTotal
+      this.#currentJob._setTotal();
+      console.log(this.#currentJob._getTotal());
       // 3. render new task on the list
       this._renderTask(task);
       // 4. clear form

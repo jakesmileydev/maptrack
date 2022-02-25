@@ -169,6 +169,45 @@ input::-webkit-inner-spin-button {
 .job-summary--contact div {
   margin-top: 0.6rem;
 }
+.job-summary--total {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+.totals {
+  display: flex;
+  flex-direction: column;
+}
+.total,
+.paid,
+.balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+.total {
+  border-bottom: 1px solid rgb(128, 128, 128);
+}
+.balance {
+  border: 3px solid #9300ff;
+  padding: 0;
+  box-sizing: content-box;
+}
+.balance-text-container {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.balance-text {
+  color: white;
+  background-color: #9300ff;
+  padding: 1rem 0.6rem;
+}
+.total-amount,
+.paid-amount,
+.balance-amount {
+  padding-right: 0.6rem;
+}
 /* ---------------------------------------- */
 /* Task */
 .task-label,
@@ -196,7 +235,8 @@ input::-webkit-inner-spin-button {
 .new-task {
   align-items: center;
   height: 3.6rem;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.233);
+  border-bottom: 1px solid rgb(128, 128, 128);
+
   display: grid;
   grid-template-columns: 5.2fr 1.3fr 1.25fr 1.4fr;
 }

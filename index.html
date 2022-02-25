@@ -74,6 +74,7 @@
         </div>
 
         <div class="sidebar-content job-summary">
+          <button class="job-summary--back-btn">&larr;</button>
           <h2 class="sidebar-title sidebar-title--job-summary">
             Nexus Project
           </h2>
@@ -93,8 +94,6 @@
               <div class="summary-date">Jan 23, 2022</div>
             </div>
           </div>
-
-          <button class="job-summary--back-btn">&larr;</button>
           <div class="job-summary--tasks">
             <label for="tasks" class="task-label">
               <div>Description</div>
@@ -118,15 +117,34 @@
                   step=".01"
                   class="new-task-input new-task-input--rate"
                 />
-
                 <div class="new-task-btn-container">
                   <button class="new-task-btn">+</button>
-                  <label class="new-task-btn-label" for="new-task-btn"
-                    >Add New Item</label
-                  >
+                  <!-- prettier-ignore -->
+                  <label class="new-task-btn-label" for="new-task-btn">Add New Item</label>
                 </div>
               </li>
             </ul>
+          </div>
+          <div class="job-summary--total">
+            <div></div>
+            <div class="totals">
+              <div class="total">
+                <div class="total-text">Total (USD)</div>
+                <div class="total-amount">9999.99</div>
+              </div>
+              <div class="paid">
+                <div class="paid-text">Paid to Date (USD)</div>
+                <div class="paid-amount">0.00</div>
+              </div>
+              <div class="balance">
+                <div class="balance-text-container">
+                  <div class="balance-text">Balance</div>
+                  <div class="balance-text-currency">USD</div>
+                </div>
+
+                <div class="balance-amount">9999.99</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -141,10 +159,8 @@
           <input type="tel" class="input--phone" />
           <label for="input--email">Email*</label>
           <input type="email" class="input--email" />
-          <label for="input--details"
-            >Additional Details
-            <span class="input--details-optional">(optional)</span></label
-          >
+          <!-- prettier-ignore -->
+          <label for="input--details">Additional Details<span class="input--details-optional">(optional)</span></label>
           <textarea
             name="description"
             class="input--details"
