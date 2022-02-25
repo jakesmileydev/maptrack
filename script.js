@@ -20,6 +20,7 @@ const inputContact = document.querySelector(".input--contact");
 const inputEmail = document.querySelector(".input--email");
 const inputDetails = document.querySelector(".input--details");
 const inputPhone = document.querySelector(".input--phone");
+const tasks = document.querySelector(".tasks");
 const newTask = document.querySelector(".new-task");
 const newTaskBtn = document.querySelector(".new-task-btn");
 const newTaskBtnContainer = document.querySelector(".new-task-btn-container");
@@ -28,7 +29,7 @@ const newTaskQty = document.querySelector(".new-task-input--qty");
 const newTaskRate = document.querySelector(".new-task-input--rate");
 const newTaskInputs = document.querySelectorAll(".new-task-input");
 
-const totalAmount = document.querySelector(".totalAmount");
+const totalAmount = document.querySelector(".total-amount");
 const paidAmount = document.querySelector(".paid-amount");
 const balanceAmount = document.querySelector(".balance-amount");
 // prettier-ignore
@@ -70,13 +71,18 @@ class Job {
     return this.#tasks;
   }
   _setTotal() {
+    let total = 0;
     this.#tasks.forEach((task) => {
-      console.log(task.amount);
-      this.#total += task.amount;
+      total += task.amount;
     });
+    this.#total = total;
   }
   _getTotal() {
     return this.#total;
+  }
+  _displayTotals() {
+    totalAmount.textContent = this._getTotal().toFixed(2);
+    balanceAmount.textContent = this._getTotal().toFixed(2);
   }
 }
 
@@ -101,6 +107,11 @@ class App {
     jobSummaryBackBtn.addEventListener("click", this._closeJobSummary.bind(this));
     jobFormCloseBtn.addEventListener("click", this._closeJobForm.bind(this));
     newTask.addEventListener("click", this._addNewTask.bind(this));
+    tasks.addEventListener("click", function (e) {
+      if (!e.target.closest(".task")) return;
+      const thisTask = e.target.closest(".task");
+      thisTask.classList.toggle("selected");
+    });
   }
 
   // Map
@@ -249,22 +260,21 @@ class App {
 
   // Job Summary and Tasks
   _openJobSummary(e) {
-    console.log(e.target.closest(".job"));
-
     if (!e.target.closest(".job")) return;
 
     this.#currentJob = this.#jobs.find(
       (job) => job.id === Number(e.target.closest(".job").dataset.id)
     );
-    const displayDate = `${
+
+    jobSummaryTitle.textContent = this.#currentJob.name;
+    summaryDate.textContent = `${
       months[this.#currentJob.date.getMonth()]
     } ${this.#currentJob.date.getDate()}, ${this.#currentJob.date.getFullYear()}`;
-    jobSummaryTitle.textContent = this.#currentJob.name;
-    summaryDate.textContent = displayDate;
     summaryId.textContent = this.#currentJob.id;
     contactName.textContent = this.#currentJob.contact;
     contactPhone.textContent = this.#currentJob.phone;
     contactEmail.textContent = this.#currentJob.email;
+    this.#currentJob._displayTotals();
 
     // 1. if there are existing tasks
     if (this.#currentJob._getTasks().length > 0) {
@@ -293,13 +303,13 @@ class App {
         newTaskDesc.value,
         newTaskQty.value,
         newTaskRate.value,
-        amount
+        Number(amount)
       );
       // 2a. push task to an array of tasks in the job object
       this.#currentJob._pushTask(task);
       // 2b. updateTotal
       this.#currentJob._setTotal();
-      console.log(this.#currentJob._getTotal());
+      this.#currentJob._displayTotals();
       // 3. render new task on the list
       this._renderTask(task);
       // 4. clear form
@@ -335,7 +345,7 @@ class App {
             <div class="task-description">${task.description}</div>
             <div class="task-qty">${Number(task.quantity)}</div>
             <div class="task-rate">${Number(task.rate).toFixed(2)}</div>
-            <div class="task-amount">${task.amount}</div>
+            <div class="task-amount">${Number(task.amount).toFixed(2)}</div>
           </li>
           `;
     newTask.insertAdjacentHTML("beforebegin", HTML);
