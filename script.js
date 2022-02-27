@@ -21,9 +21,14 @@ const inputEmail = document.querySelector(".input--email");
 const inputDetails = document.querySelector(".input--details");
 const inputPhone = document.querySelector(".input--phone");
 const tasks = document.querySelector(".tasks");
+
 const newTask = document.querySelector(".new-task");
-const newTaskBtn = document.querySelector(".new-task-btn");
-const newTaskBtnContainer = document.querySelector(".new-task-btn-container");
+const addTaskBtn = document.querySelector(".add-task-btn");
+const editTaskBtn = document.querySelector(".edit-task-btn");
+const deleteTaskBtn = document.querySelector(".delete-task-btn");
+const submitNewTaskBtn = document.querySelector(".submit-new-task-btn");
+const cancelNewTaskBtn = document.querySelector(".cancel-new-task-btn");
+const newTaskBtnContainer = document.querySelector(".job-summary-btns");
 const newTaskDesc = document.querySelector(".new-task-input--description");
 const newTaskQty = document.querySelector(".new-task-input--qty");
 const newTaskRate = document.querySelector(".new-task-input--rate");
@@ -36,18 +41,23 @@ const balanceAmount = document.querySelector(".balance-amount");
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 class Task {
-  constructor(description, quantity, rate, amount) {
+  #isSelected;
+  constructor(index, description, quantity, rate, amount) {
+    this.index = index;
     this.description = description;
     this.quantity = quantity;
     this.rate = rate;
     this.amount = Number(amount);
+  }
+  _markSelected() {
+    this.#isSelected = true;
   }
 }
 
 class Job {
   #total;
   #totalPaid;
-  #tasks;
+  #tasks = [];
   //prettier-ignore
   constructor(id,name,contact,email,details,phone,coords,status,marker) {
     this.id = id;
@@ -70,6 +80,7 @@ class Job {
   _getTasks() {
     return this.#tasks;
   }
+
   _setTotal() {
     let total = 0;
     this.#tasks.forEach((task) => {
@@ -91,7 +102,6 @@ class App {
   #mapEvent;
   #addingNewMarker;
   #fillingOutForm;
-  #addingNewTask;
   #tempMarker;
   #jobs = [];
   #currentJob;
@@ -106,30 +116,44 @@ class App {
     //prettier-ignore
     jobSummaryBackBtn.addEventListener("click", this._closeJobSummary.bind(this));
     jobFormCloseBtn.addEventListener("click", this._closeJobForm.bind(this));
-    newTask.addEventListener("click", this._addNewTask.bind(this));
-    tasks.addEventListener("click", function (e) {
-      if (!e.target.closest(".task")) return;
-      const thisTask = e.target.closest(".task");
-      thisTask.classList.toggle("selected");
-    });
+
+    addTaskBtn.addEventListener("click", this._openTaskEdit);
+    deleteTaskBtn.addEventListener("click", this._deleteTask);
+    cancelNewTaskBtn.addEventListener("click", this._closeTaskEdit);
+    submitNewTaskBtn.addEventListener("click", this._createNewTask.bind(this));
+    tasks.addEventListener("click", this._selectTask.bind(this));
   }
 
+  _selectTask(e) {
+    if (!e.target.closest(".task")) return;
+    const thisTaskEl = e.target.closest(".task");
+    tasks
+      .querySelectorAll(".task")
+      .forEach((task) => task.classList.remove("selected"));
+    thisTaskEl.classList.add("selected");
+
+    const thisTaskOb = this.#currentJob
+      ._getTasks()
+      .find(
+        (task) => task.index === Number(e.target.closest(".task").dataset.index)
+      );
+
+    thisTaskOb._markSelected();
+    console.log(this.#jobs);
+  }
   // Map
   _getPosition() {
     const success = function (position) {
       this._loadMap(position);
     };
-
     const failure = function (error) {
       console.log(`Failed to get position - ${error}`);
     };
-
     const options = {
       maximumAge: 0,
       enableHighAccuracy: true,
       timeout: 5000,
     };
-
     navigator.geolocation.getCurrentPosition(
       success.bind(this),
       failure,
@@ -286,62 +310,39 @@ class App {
     allJobs.classList.add("all-jobs--hidden");
     jobSummary.classList.add("job-summary--active");
   }
+  _createNewTask() {
+    if (!newTaskDesc.value || !newTaskQty.value || !newTaskRate.value) {
+      alert("invalid task inputs");
+      return;
+    }
+    // 1. create new task object
+    const amount = (
+      Number(newTaskQty.value) * Number(newTaskRate.value)
+    ).toFixed(2);
+    const index = this.#currentJob._getTasks().length;
+    const task = new Task(
+      index,
+      newTaskDesc.value,
+      newTaskQty.value,
+      newTaskRate.value,
+      Number(amount)
+    );
 
-  _addNewTask(e) {
-    if (this.#addingNewTask) {
-      if (!e.target.closest(".new-task-btn")) return;
-      console.log(newTaskDesc.value, newTaskQty.value, newTaskRate.value);
-      if (!newTaskDesc.value || !newTaskQty.value || !newTaskRate.value) {
-        alert("invalid task inputs");
-        return;
-      }
-      // 1. create new task object
-      const amount = (
-        Number(newTaskQty.value) * Number(newTaskRate.value)
-      ).toFixed(2);
-      const task = new Task(
-        newTaskDesc.value,
-        newTaskQty.value,
-        newTaskRate.value,
-        Number(amount)
-      );
-      // 2a. push task to an array of tasks in the job object
-      this.#currentJob._pushTask(task);
-      // 2b. updateTotal
-      this.#currentJob._setTotal();
-      this.#currentJob._displayTotals();
-      // 3. render new task on the list
-      this._renderTask(task);
-      // 4. clear form
-      newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
-      this._closeTaskEdit();
-    }
-    if (!this.#addingNewTask) {
-      this._openTaskEdit();
-      // 1. set focus to description input
-      setTimeout(() => {
-        newTaskDesc.focus();
-      }, 100);
-    }
-    this.#addingNewTask = !this.#addingNewTask;
-  }
-  _openTaskEdit() {
-    newTaskBtnContainer.classList.add("adding-task");
-    newTask.classList.add("adding-task");
-    newTaskInputs.forEach((input) => {
-      input.classList.add("adding-task");
-    });
-  }
-  _closeTaskEdit() {
-    newTaskBtnContainer.classList.remove("adding-task");
-    newTask.classList.remove("adding-task");
-    newTaskInputs.forEach((input) => {
-      input.classList.remove("adding-task");
-    });
+    // 2a. push task to an array of tasks in the job object
+    this.#currentJob._pushTask(task);
+
+    // 2b. updateTotal
+    this.#currentJob._setTotal();
+    this.#currentJob._displayTotals();
+    // 3. render new task on the list
+    this._renderTask(task);
+    // 4. clear form
+    newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
+    this._closeTaskEdit();
   }
   _renderTask(task) {
     const HTML = `
-          <li class="task">
+          <li class="task" data-index="${task.index}">
             <div class="task-description">${task.description}</div>
             <div class="task-qty">${Number(task.quantity)}</div>
             <div class="task-rate">${Number(task.rate).toFixed(2)}</div>
@@ -349,6 +350,14 @@ class App {
           </li>
           `;
     newTask.insertAdjacentHTML("beforebegin", HTML);
+  }
+  _deleteTask() {}
+  _openTaskEdit() {
+    newTask.classList.add("adding-task");
+    newTaskDesc.focus();
+  }
+  _closeTaskEdit() {
+    newTask.classList.remove("adding-task");
   }
   _closeJobSummary() {
     setTimeout(() => {

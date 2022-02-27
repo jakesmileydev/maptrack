@@ -113,9 +113,7 @@ input::-webkit-inner-spin-button {
   border-left: 8px solid #9300ff;
   cursor: pointer;
 }
-.job.job--active {
-  border-color: #21a179;
-}
+
 .job:first-child {
   margin-top: 0rem;
 }
@@ -146,6 +144,7 @@ input::-webkit-inner-spin-button {
   transform: translateX(100%);
   position: absolute;
 }
+
 .job-summary.job-summary--active {
   transform: translateX(0%);
 }
@@ -171,7 +170,7 @@ input::-webkit-inner-spin-button {
   margin-top: 0.6rem;
 }
 .job-summary--total {
-  margin: 0 0.8rem 0.8rem 0.8rem;
+  margin: 0 0.5rem 0.8rem 0.5rem;
   display: grid;
   grid-template-columns: 1fr 2fr;
 }
@@ -213,7 +212,10 @@ input::-webkit-inner-spin-button {
 /* ---------------------------------------- */
 /* Task */
 .tasks {
+  position: relative;
+  overflow: hidden;
 }
+
 .task-label {
   display: grid;
   grid-template-columns: 5fr 1fr 1.2fr 1.4fr;
@@ -223,6 +225,7 @@ input::-webkit-inner-spin-button {
 .task:hover,
 .task.selected {
   border: 2px solid #9300ff;
+  cursor: default;
 }
 .task-rate,
 .task-label-rate,
@@ -234,60 +237,90 @@ input::-webkit-inner-spin-button {
 }
 .task-label {
   border-bottom: 1px solid grey;
-
   margin: 2rem 0.5rem 2px 0.5rem;
 }
 .task {
   display: grid;
   grid-template-columns: 5fr 1fr 1.2fr 1.4fr;
-  margin: 0.5rem;
-  padding: 0.8rem 0.2rem;
+  margin: 0.3rem;
+  padding: 0.8rem 0.5rem;
   border-top: 2px solid transparent;
   border-left: 2px solid transparent;
   border-right: 2px solid transparent;
   border-bottom: 2px solid rgba(128, 128, 128, 0.102);
 }
 
+/* ---------------------------------------- */
+/* New Task */
+
 .new-task {
   align-items: center;
   height: 3.6rem;
   border-bottom: 1px solid rgb(128, 128, 128);
-  margin: 0 0.8rem;
+  margin: 0 0.5rem;
   display: grid;
   grid-template-columns: 5.2fr 1.3fr 1.25fr 1.4fr;
-}
-.new-task:hover {
-  cursor: pointer;
+  display: none;
 }
 .new-task.adding-task {
-  cursor: default;
+  display: grid;
 }
-.new-task-btn-container {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  position: absolute;
-  right: 15.6rem;
-  transition: all 0.3s ease;
-}
-.new-task-btn-container.adding-task {
-  right: -7.8rem;
-  gap: 2rem;
-}
-.new-task-btn {
+.job-summary-task-btns {
+  padding: 0.8rem 0.5rem;
+  margin: 0 0.5rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.979);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 2rem;
+  height: 4.4rem;
+}
+.job-summary-task-btns button {
+  padding: 0.6rem 1.8rem;
   color: white;
   background-color: #9300ff;
+  position: absolute;
+}
+
+.job-summary-task-btns button:hover {
+  opacity: 0.7;
+}
+.edit-task-btn {
+  transform: translateX(-140%);
+}
+.delete-task-btn {
+  transform: translateX(0%);
+}
+.add-task-btn {
+  transform: translateX(140%);
+}
+.editing-task-btns {
+  display: flex;
+  gap: 0.4rem;
+  margin-left: 1.2rem;
+}
+.submit-new-task-btn,
+.cancel-new-task-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0.1rem;
+  height: 2rem;
+  width: 2rem;
   font-size: 1.6rem;
-  right: 20rem;
+  background-color: #9300ff;
+  color: white;
 }
-.new-task-btn-label {
-  user-select: none;
-  cursor: pointer;
+.submit-new-task-btn:hover {
+  opacity: 0.7;
 }
+.cancel-new-task-btn {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #9300ff;
+  background-color: white;
+  border: 1px solid #9300ff;
+}
+
 .new-task-input--qty,
 .new-task-input--rate {
   width: 90%;
@@ -301,15 +334,8 @@ input::-webkit-inner-spin-button {
   font-size: 1rem;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.082);
   border: 1px solid rgba(128, 128, 128, 0.253);
-  visibility: hidden;
-  opacity: 0;
+
   transition: all 0.3s ease;
-}
-.new-task-input--qty.adding-task,
-.new-task-input--rate.adding-task,
-.new-task-input--description.adding-task {
-  visibility: visible;
-  opacity: 1;
 }
 
 /* ---------------------------------------- */
