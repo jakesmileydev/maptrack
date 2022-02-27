@@ -52,6 +52,9 @@ class Task {
   _markSelected() {
     this.#isSelected = true;
   }
+  _markUnselected() {
+    this.#isSelected = false;
+  }
 }
 
 class Job {
@@ -117,9 +120,9 @@ class App {
     jobSummaryBackBtn.addEventListener("click", this._closeJobSummary.bind(this));
     jobFormCloseBtn.addEventListener("click", this._closeJobForm.bind(this));
 
-    addTaskBtn.addEventListener("click", this._openTaskEdit);
+    addTaskBtn.addEventListener("click", this._openTaskCreation);
     deleteTaskBtn.addEventListener("click", this._deleteTask);
-    cancelNewTaskBtn.addEventListener("click", this._closeTaskEdit);
+    cancelNewTaskBtn.addEventListener("click", this._closeTaskCreation);
     submitNewTaskBtn.addEventListener("click", this._createNewTask.bind(this));
     tasks.addEventListener("click", this._selectTask.bind(this));
   }
@@ -127,9 +130,10 @@ class App {
   _selectTask(e) {
     if (!e.target.closest(".task")) return;
     const thisTaskEl = e.target.closest(".task");
-    tasks
-      .querySelectorAll(".task")
-      .forEach((task) => task.classList.remove("selected"));
+    tasks.querySelectorAll(".task").forEach((task) => {
+      task.classList.remove("selected");
+    });
+    this.#currentJob._getTasks().forEach((task) => task._markUnselected());
     thisTaskEl.classList.add("selected");
 
     const thisTaskOb = this.#currentJob
@@ -328,7 +332,7 @@ class App {
       Number(amount)
     );
 
-    // 2a. push task to an array of tasks in the job object
+    // 2a. push task to the tasks array in the job object
     this.#currentJob._pushTask(task);
 
     // 2b. updateTotal
@@ -338,7 +342,7 @@ class App {
     this._renderTask(task);
     // 4. clear form
     newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
-    this._closeTaskEdit();
+    this._closeTaskCreation();
   }
   _renderTask(task) {
     const HTML = `
@@ -352,17 +356,17 @@ class App {
     newTask.insertAdjacentHTML("beforebegin", HTML);
   }
   _deleteTask() {}
-  _openTaskEdit() {
+  _openTaskCreation() {
     newTask.classList.add("adding-task");
     newTaskDesc.focus();
   }
-  _closeTaskEdit() {
+  _closeTaskCreation() {
     newTask.classList.remove("adding-task");
   }
   _closeJobSummary() {
     setTimeout(() => {
       document.querySelectorAll(".task").forEach((task) => task.remove());
-      this._closeTaskEdit();
+      this._closeTaskCreation();
     }, 250);
     allJobs.classList.remove("all-jobs--hidden");
     jobSummary.classList.remove("job-summary--active");
