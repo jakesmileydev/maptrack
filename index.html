@@ -80,18 +80,18 @@
           </h2>
           <div class="job-summary--info">
             <div>
-              <label for="job-summary--contact">Contact</label>
-              <div class="job-summary--contact">
-                <div class="contact-name">Alan J Eslinger</div>
-                <div class="contact-phone">360-387-6665</div>
-                <div class="contact-email">alanisreallycool@gmail.com</div>
-              </div>
-            </div>
-            <div>
               <label for="summary-id">ID #</label>
               <div class="summary-id">366548110</div>
-              <label for="summary-date">Start Date</label>
-              <div class="summary-date">Jan 23, 2022</div>
+              <div>
+                <label for="summary-date">Start Date</label>
+                <div class="summary-date">Jan 23, 2022</div>
+              </div>
+            </div>
+            <div class="job-summary--contact">
+              <label for="job-summary--contact">Contact</label>
+              <div class="contact-name">Alan J Eslinger</div>
+              <div class="contact-phone">360-387-6665</div>
+              <div class="contact-email">alanisreallycool@gmail.com</div>
             </div>
             <div class="job-summary--details-container">
               <label for="job-summary--details">Additional Details</label>
@@ -162,6 +162,8 @@
           <input type="tel" class="input--phone" />
           <label for="input--email">Email*</label>
           <input type="email" class="input--email" />
+          <label for="input--image">Image*</label>
+          <input type="file" class="input--image" accept="image/*" />
           <!-- prettier-ignore -->
           <label for="input--details">Additional Details<span class="input--details-optional">(optional)</span></label>
           <textarea
@@ -178,9 +180,9 @@
         <button class="sidebar-buttons-view">View Job Summary</button>
       </div>
       <div class="job-summary-task-btns">
-        <button class="edit-task-btn">Edit</button>
         <button class="delete-task-btn">Delete</button>
-        <button class="add-task-btn">Add</button>
+        <button class="edit-task-btn">Edit</button>
+        <button class="add-task-btn">Add New Task</button>
       </div>
       <footer class="footer">&copy; Jake Smiley 2022</footer>
     </sidebar>

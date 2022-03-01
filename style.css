@@ -12,6 +12,7 @@
   font-family: "Prompt", sans-serif;
   color: #808080;
 }
+
 body {
   display: flex;
   height: 100vh;
@@ -33,11 +34,24 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+input:-webkit-autofill {
+  -webkit-text-fill-color: grey;
+}
+a:link,
+a:visited {
+  color: #9300ff;
+}
+.leaflet-bar a:hover,
+.leaflet-bar a:active {
+  color: #9300ff;
+}
 /* ---------------------------------------- */
 /* Sidebar */
 .sidebar {
   width: 40rem;
   background-color: white;
+  overflow: hidden;
+  position: relative;
 }
 .sidebar-content-container {
   /* subtract height of logo + footer + sidebar buttons */
@@ -94,21 +108,21 @@ input::-webkit-inner-spin-button {
   visibility: visible;
 }
 .sidebar-buttons-delete {
-  color: white;
-  background-color: #fd151b;
   border: 2px solid #fd151b;
+  color: #fd151b;
+  background-color: white;
 
   padding: 0.6rem 2rem;
   font-size: 1rem;
   transition: all 0.3s;
 }
 .sidebar-buttons-delete:hover {
-  background-color: white;
-  color: #fd151b;
+  background-color: #fd151b;
+  color: white;
 }
 .sidebar-buttons-view {
-  background-color: #9300ff;
-  color: white;
+  color: #9300ff;
+  background-color: white;
 
   padding: 1rem 2rem;
   border: 2px solid #9300ff;
@@ -116,8 +130,8 @@ input::-webkit-inner-spin-button {
   transition: all 0.3s;
 }
 .sidebar-buttons-view:hover {
-  background-color: white;
-  color: #9300ff;
+  color: white;
+  background-color: #9300ff;
 }
 .footer {
   display: flex;
@@ -199,8 +213,9 @@ input::-webkit-inner-spin-button {
 .job-summary--info {
   margin: 0.8rem;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1.2fr;
 }
+
 .job-summary--info label {
   display: block;
   width: 70%;
@@ -301,6 +316,53 @@ input::-webkit-inner-spin-button {
   border-right: 2px solid transparent;
   border-bottom: 2px solid rgba(128, 128, 128, 0.102);
 }
+.job-summary-task-btns {
+  padding: 0.6rem 0.5rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  position: absolute;
+  bottom: 5.2rem;
+  left: 6rem;
+  transform: translateX(40rem);
+  transition: all 0.3s ease;
+}
+.job-summary-task-btns.job-summary-task-btns--visible {
+  transform: translateX(0);
+}
+.job-summary-task-btns button {
+  padding: 0.6rem 2rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+.delete-task-btn {
+  color: #fd151b;
+  background-color: white;
+  border: 2px solid #fd151b;
+}
+.delete-task-btn:hover {
+  color: white;
+  background-color: #fd151b;
+}
+.edit-task-btn {
+  color: #9300ff;
+  border: 2px solid #9300ff;
+}
+.edit-task-btn:hover {
+  color: white;
+  background-color: #9300ff;
+}
+.add-task-btn {
+  background-color: white;
+  border: 2px solid #9300ff;
+  color: #9300ff;
+}
+.add-task-btn:hover {
+  color: white;
+  background-color: #9300ff;
+}
 
 /* ---------------------------------------- */
 /* New Task */
@@ -313,6 +375,7 @@ input::-webkit-inner-spin-button {
   grid-template-columns: 5.2fr 1.3fr 1.25fr 1.4fr;
   display: none;
   border: 2px solid transparent;
+  border-bottom: 2px solid rgba(128, 128, 128, 0.102);
 }
 .new-task.adding-task {
   display: grid;
@@ -323,32 +386,6 @@ input::-webkit-inner-spin-button {
   border: none;
   margin: 0;
   top: 0;
-}
-
-.job-summary-task-btns {
-  padding: 0.8rem 0.5rem;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  position: absolute;
-  bottom: 5.2rem;
-  left: 10rem;
-  transform: translateX(40rem);
-  transition: all 0.3s ease;
-}
-.job-summary-task-btns.job-summary-task-btns--visible {
-  transform: translateX(0);
-}
-.job-summary-task-btns button {
-  padding: 0.6rem 1.8rem;
-  color: white;
-  background-color: #9300ff;
-}
-
-.job-summary-task-btns button:hover {
-  opacity: 0.7;
 }
 
 .editing-task-btns {
@@ -429,13 +466,26 @@ input::-webkit-inner-spin-button {
   right: 1.4rem;
   font-size: 1.6rem;
 }
+
+.input--image::-webkit-file-upload-button {
+  display: none;
+}
+.input--image::before {
+  content: "Choose File";
+  font-size: 1rem;
+  background-color: #9300ff;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  color: white;
+  margin-right: 0.6rem;
+}
 .job-form input,
 .input--details {
   font-size: 1.1rem;
 
   outline: none;
   border: none;
-  padding: 0.4rem;
+  padding: 0.6rem 0.4rem;
   resize: none;
   border-radius: 4px;
   margin-top: 0.2rem;
@@ -494,4 +544,57 @@ input::-webkit-inner-spin-button {
 /* lol.. Nothing wrong here */
 .greenIcon {
   background-color: #9300ff;
+}
+.leaflet-popup .leaflet-popup-content-wrapper {
+  background-color: white;
+  color: white;
+  border-radius: 0;
+  padding: 0;
+  /* padding-bottom: 0; */
+  /* border: 2px solid #9300ff; */
+}
+
+.leaflet-popup .leaflet-popup-content {
+  font-size: 1.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+.leaflet-popup .leaflet-popup-tip {
+  padding-bottom: 0.6rem;
+  background-color: white;
+  /* border: 2px solid #9300ff; */
+}
+.job-popup {
+  /* background-color: #9300ff; */
+}
+.job-image {
+  width: 100%;
+}
+.popup-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+  cursor: default;
+}
+.popup-name {
+  color: grey;
+  font-weight: 400;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 0.8rem;
+  /* position: absolute;
+  top: 0;
+  left: 0; */
+}
+.popup-total {
+  color: #399e5a;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  top: 0.4rem;
+  right: 0.6rem;
+  color: white;
+}
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: rgb(202, 202, 202);
 }

@@ -19,6 +19,7 @@ const jobFormCloseBtn = document.querySelector(".job-form--close-btn");
 const jobs = document.querySelector(".jobs");
 const jobForm = document.querySelector(".job-form");
 const inputJobName = document.querySelector(".input--job-name");
+const inputImage = document.querySelector(".input--image");
 const inputContact = document.querySelector(".input--contact");
 const inputEmail = document.querySelector(".input--email");
 const inputDetails = document.querySelector(".input--details");
@@ -40,6 +41,7 @@ const totalAmount = document.querySelector(".total-amount");
 const paidAmount = document.querySelector(".paid-amount");
 const balanceAmount = document.querySelector(".balance-amount");
 const sidebarBtns = document.querySelector(".sidebar-buttons");
+const sidebarBtnsDelete = document.querySelector(".sidebar-buttons-delete");
 const sidebarBtnsView = document.querySelector(".sidebar-buttons-view");
 // prettier-ignore
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -80,11 +82,12 @@ class Job {
   #isSelected;
   #tasks = [];
   //prettier-ignore
-  constructor(id,name,contact,email,details,phone,coords,status,marker) {
+  constructor(id,name,contact,email,imageURL,details,phone,coords,status,marker) {
     this.id = id;
     this.name = name;
     this.contact = contact;
     this.email = email;
+    this.imageURL = imageURL;
     this.details = details;
     this.phone = phone;
     this.coords = coords;
@@ -114,7 +117,16 @@ class Job {
   _getTotal() {
     return this.#total;
   }
+  _updatePopupTotal() {
+    console.log(this.id);
+
+    let popupArray = Array.from(document.querySelectorAll(".popup-total"));
+    console.log(popupArray);
+
+    console.log(popupArray.forEach((popup) => console.log(popup.dataset.id)));
+  }
   _displayTotals() {
+    this._updatePopupTotal();
     totalAmount.textContent = this._getTotal().toFixed(2);
     balanceAmount.textContent = this._getTotal().toFixed(2);
   }
@@ -157,6 +169,14 @@ class App {
     submitNewTaskBtn.addEventListener("click", this._createNewTask.bind(this));
     sidebar.addEventListener("click", this._select.bind(this));
     sidebarBtnsView.addEventListener("click", this._openJobSummary.bind(this));
+    sidebarBtnsDelete.addEventListener("click", this._deleteJob.bind(this));
+  }
+  _deleteJob() {
+    const isSelected = (job) => job._getSelectedStatus() === true;
+    this.#map.removeLayer(this.#jobs.find(isSelected).marker);
+    this.#jobs.splice(this.#jobs.findIndex(isSelected), 1);
+    document.querySelector(".job.selected").remove();
+    console.log(this.#jobs);
   }
   _select(e) {
     this._selectJob(e);
@@ -186,10 +206,8 @@ class App {
     } else {
       thisJobEl.classList.remove("selected");
       sidebarBtns.classList.remove("visible");
-
       thisJobOb._markUnselected();
     }
-    console.log(this.#jobs);
   }
   _deselectJobs() {
     jobs.querySelectorAll(".job").forEach((job) => {
@@ -256,6 +274,7 @@ class App {
     const thisTaskArray = this.#currentJob._getTasks();
     if (!thisTaskArray.find((task) => task._getSelectedStatus() === true))
       return;
+
     //    find selected element
     const selectedTaskEl = document.querySelector(".task.selected");
 
@@ -263,6 +282,8 @@ class App {
     const thisTask = thisTaskArray.find(
       (task) => task.id === +selectedTaskEl.dataset.id
     );
+    // if this task is already editing, don't do anything
+    if (thisTask._getEditStatus()) return;
 
     const HTML = `
         <li class="new-task editing-task">
@@ -343,9 +364,7 @@ class App {
 
     this.#tempMarker = L.marker(clickCoords, { icon: myIcon });
 
-    this.#map.addLayer(
-      this.#tempMarker.bindPopup("creating new job...").openPopup()
-    );
+    this.#map.addLayer(this.#tempMarker);
 
     this.#addingNewMarker = false;
     document.querySelector("#map").classList.remove("adding-new-marker");
@@ -359,6 +378,11 @@ class App {
 
       this._renderMarker(clickCoords);
       this._openJobForm();
+
+      // close job summary, deselect jobs, and hide sidebar buttons
+      this._deselectJobs();
+      sidebarBtns.classList.remove("visible");
+      this._closeJobSummary();
     }
   }
   _toggleAddingNewMarker() {
@@ -372,6 +396,17 @@ class App {
     this.#fillingOutForm = true;
     inputJobName.focus();
   }
+  _closeJobForm(e) {
+    jobForm.classList.remove("job-form--active");
+    this.#fillingOutForm = false;
+    this._clearJobForm();
+    // if this event was triggered by the close btn (before creating a job), then remove the marker
+    if (!e) return;
+    if (e.target === jobFormCloseBtn) {
+      this.#map.removeLayer(this.#tempMarker);
+    }
+  }
+
   _createNewJob(e) {
     e.preventDefault();
     const id = Math.trunc(Math.random() * 1_000_000_000);
@@ -379,27 +414,54 @@ class App {
       !inputJobName.value ||
       !inputContact.value ||
       !inputEmail.value ||
-      !inputPhone.value
+      !inputPhone.value ||
+      !inputImage.value
     ) {
       alert("Invalid Form Submission, please verify data");
       return;
     }
 
+    const src = URL.createObjectURL(e.target[5].files[0]);
+
+    this.#tempMarker
+      .bindPopup(
+        L.popup({
+          autoClose: false,
+          offset: [0, -4],
+          maxWidth: 500,
+          minWidth: 250,
+          closeOnClick: false,
+          className: `job-popup`,
+        })
+      )
+      .setPopupContent(
+        `
+      <img class="job-image" src="${src}">
+      <div class="popup-info">
+        <h4 class ="popup-name">${inputJobName.value}</h4>
+        <div class="popup-total" dataset-id="${id}">$0.00</div>
+      </div>
+      `
+      )
+      .openPopup();
     const newJob = new Job(
       id,
       inputJobName.value,
       inputContact.value,
       inputEmail.value,
+      src,
       inputDetails.value,
       inputPhone.value,
       [this.#mapEvent.latlng.lat, this.#mapEvent.latlng.lng],
       "active",
       this.#tempMarker
     );
+    this.#map.flyTo(newJob.coords);
     this.#jobs.push(newJob);
     this._renderJob(newJob);
     this._closeJobForm();
     this._clearJobForm();
+    console.log(this.#jobs);
   }
   _renderJob(job) {
     const HTML = `
@@ -424,22 +486,14 @@ class App {
     //    for each job
     //      render job
   }
-  _closeJobForm(e) {
-    jobForm.classList.remove("job-form--active");
-    this.#fillingOutForm = false;
 
-    // if this event was triggered by the close btn (before creating a job), then remove the marker
-    if (!e) return;
-    if (e.target === jobFormCloseBtn) {
-      this.#map.removeLayer(this.#tempMarker);
-    }
-  }
   _clearJobForm() {
     inputJobName.value =
       inputContact.value =
       inputEmail.value =
       inputDetails.value =
       inputPhone.value =
+      inputImage.value =
         "";
   }
 
@@ -454,6 +508,7 @@ class App {
       months[this.#currentJob.date.getMonth()]
     } ${this.#currentJob.date.getDate()}, ${this.#currentJob.date.getFullYear()}`;
     summaryId.textContent = this.#currentJob.id;
+    // document.querySelector(".job-image").src = this.#currentJob.imageURL;
     contactName.textContent = this.#currentJob.contact;
     contactPhone.textContent = this.#currentJob.phone;
     contactEmail.textContent = this.#currentJob.email;
@@ -467,11 +522,22 @@ class App {
       console.log(this.#currentJob._getTasks());
       // 2. render tasks
       this.#currentJob._getTasks().forEach((task) => this._renderTask(task));
+    } else {
     }
 
     allJobs.classList.add("all-jobs--hidden");
     jobSummaryTaskBtns.classList.add("job-summary-task-btns--visible");
     jobSummary.classList.add("job-summary--active");
+  }
+  _closeJobSummary() {
+    this.#currentJob = false;
+    allJobs.classList.remove("all-jobs--hidden");
+    jobSummary.classList.remove("job-summary--active");
+    jobSummaryTaskBtns.classList.remove("job-summary-task-btns--visible");
+    setTimeout(() => {
+      document.querySelectorAll(".task").forEach((task) => task.remove());
+      this._closeTaskCreation();
+    }, 250);
   }
   _createNewTask() {
     if (!newTaskDesc.value || !newTaskQty.value || !newTaskRate.value) {
@@ -567,6 +633,7 @@ class App {
     // 1. remove task from the UI
     selectedTaskEl.remove();
     // 2. delete task data from the #tasks array in the #currentJob object
+
     this.#currentJob._removeTask(taskId);
     // 3. update totals
     this.#currentJob._setTotal();
@@ -580,16 +647,6 @@ class App {
   _closeTaskCreation() {
     newTaskDesc.value = newTaskQty.value = newTaskRate.value = "";
     newTask.classList.remove("adding-task");
-  }
-  _closeJobSummary() {
-    this.#currentJob = false;
-    allJobs.classList.remove("all-jobs--hidden");
-    jobSummary.classList.remove("job-summary--active");
-    jobSummaryTaskBtns.classList.remove("job-summary-task-btns--visible");
-    setTimeout(() => {
-      document.querySelectorAll(".task").forEach((task) => task.remove());
-      this._closeTaskCreation();
-    }, 250);
   }
 }
 
