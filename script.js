@@ -10,6 +10,7 @@ const jobSummaryTitle = document.querySelector(".sidebar-title--job-summary");
 const contactName = document.querySelector(".contact-name");
 const contactPhone = document.querySelector(".contact-phone");
 const contactEmail = document.querySelector(".contact-email");
+const summaryDetails = document.querySelector(".job-summary--details");
 const summaryId = document.querySelector(".summary-id");
 const summaryDate = document.querySelector(".summary-date");
 
@@ -37,11 +38,13 @@ const newTaskRate = document.querySelector(".new-task-input--rate");
 const totalAmount = document.querySelector(".total-amount");
 const paidAmount = document.querySelector(".paid-amount");
 const balanceAmount = document.querySelector(".balance-amount");
+const sidebarBtns = document.querySelector(".sidebar-buttons");
 // prettier-ignore
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 class Task {
   #isSelected;
+  #isEditing;
   constructor(id, description, quantity, rate, amount) {
     this.id = id;
     this.description = description;
@@ -58,11 +61,21 @@ class Task {
   _getSelectedStatus() {
     return this.#isSelected;
   }
+  _startEditing() {
+    this.#isEditing = true;
+  }
+  _stopEditing() {
+    this.#isEditing = false;
+  }
+  _getEditStatus() {
+    return this.#isEditing;
+  }
 }
 
 class Job {
   #total;
   #totalPaid;
+  #isSelected;
   #tasks = [];
   //prettier-ignore
   constructor(id,name,contact,email,details,phone,coords,status,marker) {
@@ -79,7 +92,6 @@ class Job {
     this.#tasks = new Array();
     this.#total = 0;
   }
-
   _pushTask(task) {
     this.#tasks.push(task);
   }
@@ -90,11 +102,10 @@ class Job {
   _getTasks() {
     return this.#tasks;
   }
-
   _setTotal() {
     let total = 0;
     this.#tasks.forEach((task) => {
-      total += task.amount;
+      total += Number(task.amount);
     });
     this.#total = total;
   }
@@ -105,6 +116,15 @@ class Job {
     totalAmount.textContent = this._getTotal().toFixed(2);
     balanceAmount.textContent = this._getTotal().toFixed(2);
   }
+  _markSelected() {
+    this.#isSelected = true;
+  }
+  _markUnselected() {
+    this.#isSelected = false;
+  }
+  _getSelectedStatus() {
+    return this.#isSelected;
+  }
 }
 
 class App {
@@ -112,6 +132,7 @@ class App {
   #mapEvent;
   #addingNewMarker;
   #fillingOutForm;
+
   #tempMarker;
   #jobs = [];
   #currentJob;
@@ -122,18 +143,164 @@ class App {
     addMarkerBtn.addEventListener("click", this._toggleAddingNewMarker.bind(this));
     jobForm.addEventListener("submit", this._createNewJob.bind(this));
     this._renderAllJobs();
-    jobs.addEventListener("click", this._openJobSummary.bind(this));
+    // jobs.addEventListener("click", this._selectJob.bind(this));
     //prettier-ignore
     jobSummaryBackBtn.addEventListener("click", this._closeJobSummary.bind(this));
     jobFormCloseBtn.addEventListener("click", this._closeJobForm.bind(this));
-
     addTaskBtn.addEventListener("click", this._openTaskCreation);
+    editTaskBtn.addEventListener("click", this._openEditTask.bind(this));
+    tasks.addEventListener("click", this._handleEditing.bind(this));
     deleteTaskBtn.addEventListener("click", this._deleteTask.bind(this));
     cancelNewTaskBtn.addEventListener("click", this._closeTaskCreation);
     submitNewTaskBtn.addEventListener("click", this._createNewTask.bind(this));
-    sidebar.addEventListener("click", this._selectTask.bind(this));
+    sidebar.addEventListener("click", this._select.bind(this));
   }
+  _select(e) {
+    this._selectJob(e);
+    this._selectTask(e);
+  }
+  _selectJob(e) {
+    // if selected and open button pressed
+    //        open job summary
+    if (!e.target.closest(".job")) {
+      sidebarBtns.classList.remove("visible");
 
+      this._deselectJobs();
+      return;
+    }
+    // console.log(e.target.closest(".job"));
+    // if (!e.target.closest(".job")) return;
+    const thisJobEl = e.target.closest(".job");
+    const thisJobOb = this.#jobs.find(
+      (job) => job.id === Number(thisJobEl.dataset.id)
+    );
+
+    if (!thisJobOb._getSelectedStatus()) {
+      this._deselectJobs();
+      thisJobEl.classList.add("selected");
+      thisJobOb._markSelected();
+      sidebarBtns.classList.add("visible");
+      this.#map.flyTo(thisJobOb.coords, 11, {
+        animate: true,
+      });
+    } else {
+      thisJobEl.classList.remove("selected");
+      thisJobOb._markUnselected();
+    }
+    console.log(this.#jobs);
+  }
+  _deselectJobs() {
+    jobs.querySelectorAll(".job").forEach((job) => {
+      job.classList.remove("selected");
+      console.log(job);
+    });
+    this.#jobs?.forEach((job) => job._markUnselected());
+  }
+  _handleEditing(e) {
+    if (
+      !e.target.closest(".submit-new-task-btn.editing-task") &&
+      !e.target.closest(".cancel-new-task-btn.editing-task")
+    )
+      return;
+    const selectedTaskEl = document.querySelector(".task.selected");
+
+    const thisTaskArray = this.#currentJob._getTasks();
+    const thisTask = thisTaskArray.find(
+      (task) => task.id === +selectedTaskEl.dataset.id
+    );
+    const closeEdit = function () {
+      selectedTaskEl.querySelector(".new-task.editing-task").remove();
+
+      selectedTaskEl.querySelector(".task-description").style.display = "block";
+      selectedTaskEl.querySelector(".task-qty").style.display = "block";
+      selectedTaskEl.querySelector(".task-rate").style.display = "block";
+      selectedTaskEl.querySelector(".task-amount").style.display = "block";
+
+      thisTask._stopEditing();
+    };
+    if (e.target.closest(".submit-new-task-btn.editing-task")) {
+      selectedTaskEl.querySelector(".task-description").textContent =
+        thisTask.description = selectedTaskEl.querySelector(
+          ".new-task-input--description.editing-task"
+        ).value;
+
+      selectedTaskEl.querySelector(".task-qty").textContent =
+        thisTask.quantity = selectedTaskEl.querySelector(
+          ".new-task-input--qty.editing-task"
+        ).value;
+
+      selectedTaskEl.querySelector(".task-rate").textContent = thisTask.rate =
+        selectedTaskEl.querySelector(
+          ".new-task-input--rate.editing-task"
+        ).value;
+
+      selectedTaskEl.querySelector(".task-amount").textContent =
+        thisTask.amount = (
+          Number(thisTask.quantity) * Number(thisTask.rate)
+        ).toFixed(2);
+
+      this.#currentJob._setTotal();
+      this.#currentJob._displayTotals();
+      closeEdit();
+      console.log(this.#currentJob._getTasks());
+    }
+    if (e.target.closest(".cancel-new-task-btn.editing-task")) {
+      console.log(this.#currentJob._getTasks());
+
+      closeEdit();
+    }
+  }
+  _openEditTask() {
+    // if no task is selected, don't do anything
+    const thisTaskArray = this.#currentJob._getTasks();
+    if (!thisTaskArray.find((task) => task._getSelectedStatus() === true))
+      return;
+    //    find selected element
+    const selectedTaskEl = document.querySelector(".task.selected");
+
+    //    find selected task in #currentJob.#tasks
+    const thisTask = thisTaskArray.find(
+      (task) => task.id === +selectedTaskEl.dataset.id
+    );
+
+    const HTML = `
+        <li class="new-task editing-task">
+          <input
+            type="text"
+            class="new-task-input new-task-input--description editing-task"
+          />
+          <input
+            type="number"
+            step=".01"
+            class="new-task-input new-task-input--qty editing-task"
+          />
+          <input
+            type="number"
+            step=".01"
+            class="new-task-input new-task-input--rate editing-task"
+          />
+          <div class="editing-task-btns editing-task">
+            <button class="submit-new-task-btn editing-task">+</button>
+            <button class="cancel-new-task-btn editing-task">x</button>
+          </div>
+        </li>
+      `;
+
+    thisTask._startEditing();
+    selectedTaskEl.insertAdjacentHTML("afterbegin", HTML);
+    selectedTaskEl.querySelector(".task-description").style.display = "none";
+    selectedTaskEl.querySelector(".task-qty").style.display = "none";
+    selectedTaskEl.querySelector(".task-rate").style.display = "none";
+    selectedTaskEl.querySelector(".task-amount").style.display = "none";
+    selectedTaskEl.querySelector(
+      ".new-task-input--description.editing-task"
+    ).value = thisTask.description;
+    selectedTaskEl.querySelector(".new-task-input--qty.editing-task").value =
+      thisTask.quantity;
+    selectedTaskEl.querySelector(".new-task-input--rate.editing-task").value =
+      thisTask.rate;
+    selectedTaskEl.querySelector(".new-task-input--description").focus();
+  }
   // Map
   _getPosition() {
     const success = function (position) {
@@ -249,7 +416,7 @@ class App {
       </div>
     </li>
     `;
-    jobs.insertAdjacentHTML("afterbegin", HTML);
+    jobs.insertAdjacentHTML("beforeend", HTML);
   }
   _renderAllJobs() {
     // if there are any jobs
@@ -277,8 +444,6 @@ class App {
 
   // Job Summary and Tasks
   _openJobSummary(e) {
-    if (!e.target.closest(".job")) return;
-
     this.#currentJob = this.#jobs.find(
       (job) => job.id === Number(e.target.closest(".job").dataset.id)
     );
@@ -291,6 +456,9 @@ class App {
     contactName.textContent = this.#currentJob.contact;
     contactPhone.textContent = this.#currentJob.phone;
     contactEmail.textContent = this.#currentJob.email;
+    summaryDetails.textContent = this.#currentJob.details
+      ? this.#currentJob.details
+      : "(none)";
     this.#currentJob._displayTotals();
 
     // 1. if there are existing tasks
@@ -338,15 +506,23 @@ class App {
           <li class="task" data-id="${task.id}">
             <div class="task-description">${task.description}</div>
             <div class="task-qty">${Number(task.quantity)}</div>
-            <div class="task-rate">${Number(task.rate).toFixed(2)}</div>
+            <div class="task-rate">${Number(task.rate)}</div>
             <div class="task-amount">${Number(task.amount).toFixed(2)}</div>
           </li>
           `;
     newTask.insertAdjacentHTML("beforebegin", HTML);
   }
   _selectTask(e) {
-    // if the job summary is not open, then no currentJob value exists, don't do anything
-    if (!this.#currentJob) return;
+    if (
+      // if the job summary is not open, then no currentJob value exists, don't do anything
+      !this.#currentJob ||
+      // if editing a task, disable selection
+      this.#currentJob
+        ._getTasks()
+        .some((task) => task._getEditStatus() === true)
+    )
+      return;
+
     if (
       e.target.closest(".edit-task-btn") ||
       e.target.closest(".delete-task-btn")
@@ -390,6 +566,9 @@ class App {
     selectedTaskEl.remove();
     // 2. delete task data from the #tasks array in the #currentJob object
     this.#currentJob._removeTask(taskId);
+    // 3. update totals
+    this.#currentJob._setTotal();
+    this.#currentJob._displayTotals();
     console.log(thisTaskArray);
   }
   _openTaskCreation() {
