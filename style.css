@@ -41,7 +41,7 @@ input::-webkit-inner-spin-button {
 }
 .sidebar-content-container {
   /* subtract height of logo + footer + sidebar buttons */
-  height: calc(100% - 14rem);
+  height: calc(100% - 16rem);
   width: 40rem;
   min-height: 10rem;
   position: relative;
@@ -82,10 +82,12 @@ input::-webkit-inner-spin-button {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  height: 3.4rem;
   visibility: hidden;
   opacity: 0;
   transition: all 0.3s ease;
+  /* Don't Change without also changing .sidebar-content-container's height */
+  height: 3.4rem;
+  margin: 1rem 0;
 }
 .sidebar-buttons.visible {
   opacity: 1;
@@ -104,7 +106,7 @@ input::-webkit-inner-spin-button {
   background-color: white;
   color: #fd151b;
 }
-.sidebar-buttons-open {
+.sidebar-buttons-view {
   background-color: #9300ff;
   color: white;
 
@@ -113,7 +115,7 @@ input::-webkit-inner-spin-button {
   font-size: 1rem;
   transition: all 0.3s;
 }
-.sidebar-buttons-open:hover {
+.sidebar-buttons-view:hover {
   background-color: white;
   color: #9300ff;
 }
@@ -322,37 +324,33 @@ input::-webkit-inner-spin-button {
   margin: 0;
   top: 0;
 }
-.job-summary--total {
-  border-top: 1px solid rgb(128, 128, 128);
-}
+
 .job-summary-task-btns {
   padding: 0.8rem 0.5rem;
-  margin: 0 0.5rem;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.979);
+
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 4.4rem;
+  gap: 1rem;
+  position: absolute;
+  bottom: 5.2rem;
+  left: 10rem;
+  transform: translateX(40rem);
+  transition: all 0.3s ease;
+}
+.job-summary-task-btns.job-summary-task-btns--visible {
+  transform: translateX(0);
 }
 .job-summary-task-btns button {
   padding: 0.6rem 1.8rem;
   color: white;
   background-color: #9300ff;
-  position: absolute;
 }
 
 .job-summary-task-btns button:hover {
   opacity: 0.7;
 }
-.edit-task-btn {
-  transform: translateX(-140%);
-}
-.delete-task-btn {
-  transform: translateX(0%);
-}
-.add-task-btn {
-  transform: translateX(140%);
-}
+
 .editing-task-btns {
   display: flex;
   gap: 0.4rem;

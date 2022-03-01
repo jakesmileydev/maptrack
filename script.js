@@ -7,6 +7,7 @@ const jobSummary = document.querySelector(".job-summary");
 const jobSummaryBackBtn = document.querySelector(".job-summary--back-btn");
 
 const jobSummaryTitle = document.querySelector(".sidebar-title--job-summary");
+const jobSummaryTaskBtns = document.querySelector(".job-summary-task-btns");
 const contactName = document.querySelector(".contact-name");
 const contactPhone = document.querySelector(".contact-phone");
 const contactEmail = document.querySelector(".contact-email");
@@ -39,6 +40,7 @@ const totalAmount = document.querySelector(".total-amount");
 const paidAmount = document.querySelector(".paid-amount");
 const balanceAmount = document.querySelector(".balance-amount");
 const sidebarBtns = document.querySelector(".sidebar-buttons");
+const sidebarBtnsView = document.querySelector(".sidebar-buttons-view");
 // prettier-ignore
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -154,22 +156,20 @@ class App {
     cancelNewTaskBtn.addEventListener("click", this._closeTaskCreation);
     submitNewTaskBtn.addEventListener("click", this._createNewTask.bind(this));
     sidebar.addEventListener("click", this._select.bind(this));
+    sidebarBtnsView.addEventListener("click", this._openJobSummary.bind(this));
   }
   _select(e) {
     this._selectJob(e);
     this._selectTask(e);
   }
   _selectJob(e) {
-    // if selected and open button pressed
-    //        open job summary
     if (!e.target.closest(".job")) {
       sidebarBtns.classList.remove("visible");
 
       this._deselectJobs();
       return;
     }
-    // console.log(e.target.closest(".job"));
-    // if (!e.target.closest(".job")) return;
+
     const thisJobEl = e.target.closest(".job");
     const thisJobOb = this.#jobs.find(
       (job) => job.id === Number(thisJobEl.dataset.id)
@@ -185,6 +185,8 @@ class App {
       });
     } else {
       thisJobEl.classList.remove("selected");
+      sidebarBtns.classList.remove("visible");
+
       thisJobOb._markUnselected();
     }
     console.log(this.#jobs);
@@ -192,7 +194,6 @@ class App {
   _deselectJobs() {
     jobs.querySelectorAll(".job").forEach((job) => {
       job.classList.remove("selected");
-      console.log(job);
     });
     this.#jobs?.forEach((job) => job._markUnselected());
   }
@@ -445,7 +446,7 @@ class App {
   // Job Summary and Tasks
   _openJobSummary(e) {
     this.#currentJob = this.#jobs.find(
-      (job) => job.id === Number(e.target.closest(".job").dataset.id)
+      (job) => job._getSelectedStatus() === true
     );
 
     jobSummaryTitle.textContent = this.#currentJob.name;
@@ -469,6 +470,7 @@ class App {
     }
 
     allJobs.classList.add("all-jobs--hidden");
+    jobSummaryTaskBtns.classList.add("job-summary-task-btns--visible");
     jobSummary.classList.add("job-summary--active");
   }
   _createNewTask() {
@@ -583,6 +585,7 @@ class App {
     this.#currentJob = false;
     allJobs.classList.remove("all-jobs--hidden");
     jobSummary.classList.remove("job-summary--active");
+    jobSummaryTaskBtns.classList.remove("job-summary-task-btns--visible");
     setTimeout(() => {
       document.querySelectorAll(".task").forEach((task) => task.remove());
       this._closeTaskCreation();
