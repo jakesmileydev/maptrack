@@ -580,12 +580,8 @@ a:visited {
 .popup-name {
   color: grey;
   font-weight: 400;
-  text-transform: uppercase;
   text-align: center;
   padding-bottom: 0.8rem;
-  /* position: absolute;
-  top: 0;
-  left: 0; */
 }
 .popup-total {
   color: #399e5a;
