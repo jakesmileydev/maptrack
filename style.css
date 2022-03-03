@@ -9,7 +9,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Prompt", sans-serif;
+  font-family: "Roboto", sans-serif;
   color: #808080;
 }
 
@@ -86,7 +86,6 @@ a:visited {
   font-size: 3rem;
 }
 .logo-text {
-  font-family: "Comfortaa", cursive;
   background: -webkit-linear-gradient(45deg, #9300ff, #99b0b0);
   background-clip: text;
   -webkit-background-clip: text;
